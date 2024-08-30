@@ -1,7 +1,5 @@
 package flixel.animation;
 
-import flixel.FlxG;
-import flixel.FlxSprite;
 import flixel.graphics.frames.FlxFrame;
 import flixel.util.FlxDestroyUtil.IFlxDestroyable;
 
@@ -42,6 +40,13 @@ class FlxAnimationController implements IFlxDestroyable
 	 * The total number of frames in this image.
 	 * WARNING: assumes each row in the sprite sheet is full!
 	 */
+	public var numFrames(get, never):Int;
+
+	/**
+	* The total number of frames in this image.
+	* WARNING: assumes each row in the sprite sheet is full!
+	*/
+	@:deprecated("frames is deprecated, use numFrames")
 	public var frames(get, never):Int;
 
 	/**
@@ -90,12 +95,14 @@ class FlxAnimationController implements IFlxDestroyable
 
 	public static var globalSpeed:Float = 1;
 	public var followGlobalSpeed:Bool = true;
+
 	public function update(elapsed:Float):Void
 	{
 		if (_curAnim != null)
 		{
 			var e:Float = elapsed;
-			if(followGlobalSpeed) e *= globalSpeed;
+			if (followGlobalSpeed)
+				e *= globalSpeed;
 
 			_curAnim.update(e);
 		}
@@ -150,6 +157,14 @@ class FlxAnimationController implements IFlxDestroyable
 		callback = null;
 		_sprite = null;
 	}
+
+	#if (flixel >= "5.3.0")
+	@:allow(flixel.animation.FlxAnimation)
+	function getFrameDuration(index:Int)
+	{
+		return _sprite.frames.frames[index].duration;
+	}
+	#end
 
 	function clearPrerotated():Void
 	{
@@ -357,7 +372,7 @@ class FlxAnimationController implements IFlxDestroyable
 	public function appendByStringIndices(Name:String, Prefix:String, Indices:Array<String>, Postfix:String):Void
 	{
 		var anim:FlxAnimation = _animations.get(Name);
-		if (anim !== null)
+		if (anim == null)
 		{
 			FlxG.log.warn("No animation called \"" + Name + "\"");
 			return;
@@ -725,8 +740,6 @@ class FlxAnimationController implements IFlxDestroyable
 			if (frame.name != null && StringTools.startsWith(frame.name, Prefix))
 			{
 				AnimFrames.push(frame);
-			}else{
-				AnimFrames.push(getFrameIndex(frame));
 			}
 		}
 	}
@@ -852,10 +865,13 @@ class FlxAnimationController implements IFlxDestroyable
 		return Value;
 	}
 
-	inline function get_frames():Int
+	inline function get_numFrames():Int
 	{
 		return _sprite.numFrames;
 	}
+
+	inline function get_frames():Int
+		return numFrames;
 
 	/**
 	 * Helper function used for finding index of `FlxFrame` in `_framesData`'s frames array
