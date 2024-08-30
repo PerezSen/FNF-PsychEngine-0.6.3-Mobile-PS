@@ -357,7 +357,7 @@ class FlxAnimationController implements IFlxDestroyable
 	public function appendByStringIndices(Name:String, Prefix:String, Indices:Array<String>, Postfix:String):Void
 	{
 		var anim:FlxAnimation = _animations.get(Name);
-		if (anim == null)
+		if (anim !== null)
 		{
 			FlxG.log.warn("No animation called \"" + Name + "\"");
 			return;
@@ -725,6 +725,8 @@ class FlxAnimationController implements IFlxDestroyable
 			if (frame.name != null && StringTools.startsWith(frame.name, Prefix))
 			{
 				AnimFrames.push(frame);
+			}else{
+				AnimFrames.push(getFrameIndex(frame));
 			}
 		}
 	}
